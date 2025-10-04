@@ -12,20 +12,19 @@ app.use(bodyParser.json());
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// Store stories in memory
+
 let storyHistory = [];
 
-// Test route
+
 app.get("/ping", (req, res) => {
   res.send("Backend is working!");
 });
 
-// Get all stories
+
 app.get("/stories", (req, res) => {
   res.json({ stories: storyHistory });
 });
 
-// Generate story for a memory
 app.post("/generate-story", async (req, res) => {
   const { text } = req.body;
   if (!text) return res.status(400).json({ error: "No text provided" });
@@ -51,5 +50,5 @@ app.post("/generate-story", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`✅ Backend running at http://localhost:${port}`);
+  console.log(`Backend running at http://localhost:${port}`);
 });

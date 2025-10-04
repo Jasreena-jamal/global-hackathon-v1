@@ -1,41 +1,56 @@
-body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(to bottom, #e0f2fe, #ffffff);
+html, body {
+  height: 100%;
   margin: 0;
   padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to bottom, #e0f2fe, #ffffff);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
+  overflow-y: auto;
 }
 
 .container {
   width: 100%;
   max-width: 700px;
   padding: 20px;
+  margin-top: 50px;
 }
 
 h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.8rem;
   text-align: center;
-  color: #2563eb;
+  color: #1e3a8a;
+  margin-bottom: 20px;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
 textarea {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   font-size: 16px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid #ccc;
   margin-bottom: 10px;
+  resize: none;
 }
 
 button {
   padding: 10px 20px;
-  background-color: #3b82f6;
-  color: white;
+  margin-right: 10px;
   border: none;
   border-radius: 8px;
-  cursor: pointer;
   font-size: 16px;
-  margin-bottom: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 button:disabled {
@@ -43,21 +58,45 @@ button:disabled {
   cursor: not-allowed;
 }
 
-.story-card {
-  background-color: #fef3c7;
+button:nth-child(2) {
+  background-color: #3b82f6;
+  color: white;
+}
+
+button:nth-child(2):hover {
+  background-color: #2563eb;
+}
+
+button:nth-child(1) {
+  background-color: #f97316;
+  color: white;
+}
+
+button:nth-child(1):hover {
+  background-color: #ea580c;
+}
+
+div.story-card {
+  background-color: #e0f7fa;
   padding: 15px;
-  border-radius: 8px;
+  border-radius: 10px;
   margin-bottom: 15px;
-  box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0px 3px 8px rgba(0,0,0,0.1);
 }
 
 .story-card p {
   margin: 5px 0;
+  line-height: 1.6;
+  color: #333;
 }
 
 .story-card button {
   margin-top: 10px;
   font-size: 14px;
-  background-color: #f97316;
+  background-color: #60a5fa;
+  color: white;
 }
 
+.story-card button:hover {
+  background-color: #3b82f6;
+}

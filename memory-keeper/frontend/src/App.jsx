@@ -5,6 +5,7 @@ export default function App() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [stories, setStories] = useState([]);
+  const [listening, setListening] = useState(false);
 
   // Fetch existing stories on load
   useEffect(() => {
@@ -14,7 +15,29 @@ export default function App() {
       .catch(err => console.error("Error fetching stories:", err));
   }, []);
 
-  // Send memory to backend
+  // Voice-to-text
+  const startListening = () => {
+    if (!("webkitSpeechRecognition" in window)) {
+      alert("Your browser does not support voice input. Use Chrome or Edge.");
+      return;
+    }
+
+    const recognition = new window.webkitSpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
+
+    recognition.onstart = () => setListening(true);
+    recognition.onend = () => setListening(false);
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setInput(prev => prev + " " + transcript);
+    };
+
+    recognition.start();
+  };
+
   const handleSend = async () => {
     if (!input.trim()) return;
     setLoading(true);
@@ -25,6 +48,7 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: input }),
       });
+
       const data = await res.json();
 
       if (data.story) {
@@ -41,7 +65,6 @@ export default function App() {
     }
   };
 
-  // Download PDF for a story
   const handleDownloadPDF = (storyObj) => {
     const doc = new jsPDF();
     doc.setFontSize(14);
@@ -57,17 +80,24 @@ export default function App() {
 
   return (
     <div className="container">
-      <h1>💖 Memory Keeper</h1>
+      <h1>Timeless Tales</h1>
 
       <textarea
         rows="3"
-        placeholder="Enter a memory..."
+        placeholder="Enter a memory or use voice..."
         value={input}
         onChange={(e) => setInput(e.target.value)}
       />
-      <button onClick={handleSend} disabled={loading}>
-        {loading ? "Generating..." : "Send Memory"}
-      </button>
+
+      <div style={{ marginBottom: "10px" }}>
+        <button onClick={startListening} disabled={listening}>
+          {listening ? "Listening..." : "Record Voice"}
+        </button>
+
+        <button onClick={handleSend} disabled={loading}>
+          {loading ? "Generating..." : "Send Memory"}
+        </button>
+      </div>
 
       {stories.map((item, index) => (
         <div key={index} className="story-card">
