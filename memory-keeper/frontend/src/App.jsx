@@ -1,13 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { jsPDF } from "jspdf";
 
-function App() {
+export default function App() {
   const [input, setInput] = useState("");
-  const [story, setStory] = useState("");
   const [loading, setLoading] = useState(false);
+  const [stories, setStories] = useState([]);
 
-  const generateStory = async () => {
+  // Fetch existing stories on load
+  useEffect(() => {
+    fetch("http://localhost:5000/stories")
+      .then(res => res.json())
+      .then(data => setStories(data.stories || []))
+      .catch(err => console.error("Error fetching stories:", err));
+  }, []);
+
+  // Send memory to backend
+  const handleSend = async () => {
+    if (!input.trim()) return;
     setLoading(true);
-    setStory("");
 
     try {
       const res = await fetch("http://localhost:5000/generate-story", {
@@ -15,58 +25,57 @@ function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: input }),
       });
-
       const data = await res.json();
+
       if (data.story) {
-        setStory(data.story);
-      } else {
-        setStory("Error: No story returned. Check backend logs.");
+        setStories(data.history || [{ memory: input, story: data.story }]);
+        setInput("");
+      } else if (data.error) {
+        alert("Error from backend: " + data.error);
       }
     } catch (err) {
-      console.error(err);
-      setStory("Error: Could not connect to backend.");
+      console.error("Fetch error:", err);
+      alert("Could not connect to backend.");
     } finally {
       setLoading(false);
     }
   };
 
+  // Download PDF for a story
+  const handleDownloadPDF = (storyObj) => {
+    const doc = new jsPDF();
+    doc.setFontSize(14);
+    doc.text("Memory:", 10, 10);
+    doc.setFontSize(12);
+    doc.text(storyObj.memory, 10, 20, { maxWidth: 180 });
+    doc.setFontSize(14);
+    doc.text("Story:", 10, 50);
+    doc.setFontSize(12);
+    doc.text(storyObj.story, 10, 60, { maxWidth: 180 });
+    doc.save("memory-story.pdf");
+  };
+
   return (
-    <div style={{ fontFamily: "sans-serif", padding: "2rem", maxWidth: 600, margin: "auto" }}>
-      <h1>Memory Keeper</h1>
-      <p>Write down a special memory, and I’ll turn it into a heartwarming story.</p>
+    <div className="container">
+      <h1>💖 Memory Keeper</h1>
 
       <textarea
-        rows="5"
-        style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ccc" }}
-        placeholder="Enter your memory..."
+        rows="3"
+        placeholder="Enter a memory..."
         value={input}
         onChange={(e) => setInput(e.target.value)}
       />
-
-      <button
-        style={{
-          marginTop: "10px",
-          background: "#2563eb",
-          color: "white",
-          padding: "10px 20px",
-          border: "none",
-          borderRadius: "6px",
-          cursor: "pointer",
-        }}
-        onClick={generateStory}
-        disabled={loading}
-      >
-        {loading ? "Generating..." : "Generate Story"}
+      <button onClick={handleSend} disabled={loading}>
+        {loading ? "Generating..." : "Send Memory"}
       </button>
 
-      {story && (
-        <div style={{ marginTop: "20px", padding: "15px", background: "", borderRadius: "8px" }}>
-          <h2>✨ Generated Story:</h2>
-          <p>{story}</p>
+      {stories.map((item, index) => (
+        <div key={index} className="story-card">
+          <p><strong>Memory:</strong> {item.memory}</p>
+          <p>{item.story}</p>
+          <button onClick={() => handleDownloadPDF(item)}>📄 Download PDF</button>
         </div>
-      )}
+      ))}
     </div>
   );
 }
-
-export default App;
