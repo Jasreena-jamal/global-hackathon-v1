@@ -7,24 +7,37 @@ const OpenAI = require("openai");
 const app = express();
 const port = process.env.PORT || 5000;
 
+// ✅ Middleware setup
 app.use(cors());
 app.use(bodyParser.json());
 
+// 🧼 Prevent caching of API responses
+app.use((req, res, next) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  res.setHeader("Surrogate-Control", "no-store");
+  next();
+});
+
+// ✅ OpenAI setup
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-
-storyHistory = [];
+// 🧠 In-memory story store
+let storyHistory = [];
 console.log("Story history cleared on server start");
 
+// ✅ Health check
 app.get("/ping", (req, res) => {
   res.send("Backend is working!");
 });
 
-
+// ✅ Get all stories
 app.get("/stories", (req, res) => {
   res.json({ stories: storyHistory });
 });
 
+// ✅ Generate new story
 app.post("/generate-story", async (req, res) => {
   const { text } = req.body;
   if (!text) return res.status(400).json({ error: "No text provided" });
@@ -42,6 +55,7 @@ app.post("/generate-story", async (req, res) => {
 
     const story = completion.choices[0].message.content;
     storyHistory.push({ memory: text, story });
+
     res.json({ story, history: storyHistory });
   } catch (err) {
     console.error(err);
@@ -49,6 +63,7 @@ app.post("/generate-story", async (req, res) => {
   }
 });
 
+// ✅ Start server
 app.listen(port, () => {
   console.log(`Backend running at http://localhost:${port}`);
 });
