@@ -32,12 +32,12 @@ app.get("/ping", (req, res) => {
   res.send("Backend is working!");
 });
 
-// ✅ Get all stories
+// Get all stories
 app.get("/stories", (req, res) => {
   res.json({ stories: storyHistory });
 });
 
-// ✅ Generate new story
+// Generate new story
 app.post("/generate-story", async (req, res) => {
   const { text } = req.body;
   if (!text) return res.status(400).json({ error: "No text provided" });
@@ -63,7 +63,7 @@ app.post("/generate-story", async (req, res) => {
   }
 });
 
-// ✅ Start server
+// Start server
 app.listen(port, () => {
   console.log(`Backend running at http://localhost:${port}`);
 });
