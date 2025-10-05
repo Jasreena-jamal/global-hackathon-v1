@@ -21,6 +21,13 @@ An AI-powered interactive web app that helps grandparents to record/write their 
 - Frontend: Vercel 
 - Backend: Render  
 
+## Deployment
+
+Backend: Deployed on Render
+Frontend: Deployed on Vercel
+
+Example Live Demo:
+https://global-hackathon-v1-git-main-jasreenas-projects.vercel.app?_vercel_share=dA4gmiw8vn3NARRVUHpveyRVWNvi1NhC
 
 ##  Setup (for local development)
 
@@ -56,11 +63,3 @@ npm start
 Frontend:
 cd frontend
 npm run dev
-
-## Deployment
-
-Backend: Deployed on Render
-Frontend: Deployed on Vercel
-
-Example Live Demo:
-https://global-hackathon-v1-git-main-jasreenas-projects.vercel.app?_vercel_share=dA4gmiw8vn3NARRVUHpveyRVWNvi1NhC
