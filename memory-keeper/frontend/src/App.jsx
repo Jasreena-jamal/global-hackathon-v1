@@ -7,15 +7,19 @@ export default function App() {
   const [stories, setStories] = useState([]);
   const [listening, setListening] = useState(false);
 
+  // Backend URL — automatically switches between local & live
+  const API_BASE =
+    import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   // Fetch existing stories on load
   useEffect(() => {
-    fetch("http://localhost:5000/stories")
-      .then(res => res.json())
-      .then(data => setStories(data.stories || []))
-      .catch(err => console.error("Error fetching stories:", err));
+    fetch(`${API_BASE}/stories`)
+      .then((res) => res.json())
+      .then((data) => setStories(data.stories || []))
+      .catch((err) => console.error("Error fetching stories:", err));
   }, []);
 
-  // Voice-to-text
+  // 🎙 Voice-to-text feature
   const startListening = () => {
     if (!("webkitSpeechRecognition" in window)) {
       alert("Your browser does not support voice input. Use Chrome or Edge.");
@@ -32,18 +36,19 @@ export default function App() {
 
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
-      setInput(prev => prev + " " + transcript);
+      setInput((prev) => prev + " " + transcript);
     };
 
     recognition.start();
   };
 
+  // Send memory to backend for story generation
   const handleSend = async () => {
     if (!input.trim()) return;
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/generate-story", {
+      const res = await fetch(`${API_BASE}/generate-story`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: input }),
@@ -52,7 +57,10 @@ export default function App() {
       const data = await res.json();
 
       if (data.story) {
-        setStories(data.history || [{ memory: input, story: data.story }]);
+        setStories((prev) => [
+          { memory: input, story: data.story },
+          ...prev,
+        ]);
         setInput("");
       } else if (data.error) {
         alert("Error from backend: " + data.error);
@@ -65,6 +73,7 @@ export default function App() {
     }
   };
 
+  // Download story as PDF
   const handleDownloadPDF = (storyObj) => {
     const doc = new jsPDF();
     doc.setFontSize(14);
