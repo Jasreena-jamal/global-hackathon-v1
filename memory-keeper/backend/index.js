@@ -13,8 +13,8 @@ app.use(bodyParser.json());
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 
-let storyHistory = [];
-
+storyHistory = [];
+console.log("Story history cleared on server start");
 
 app.get("/ping", (req, res) => {
   res.send("Backend is working!");
